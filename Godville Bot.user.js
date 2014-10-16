@@ -152,7 +152,7 @@ $.godville = {
             $.godville.addSwitcher("Предметы", $.godville.autoactitem, 60000);
             $.godville.addSwitcher("Аккумулятор", $.godville.autoaccumulate, 1000);
             $.godville.addWatcher("Автолечение", $.godville.getHealCount);
-            $.godville.addWatcher("Автораскопок", $.godville.getHealCount);
+            $.godville.addWatcher("Автораскопок", $.godville.getDigCount);
             $.godville.addWatcher("Использовано предметов", $.godville.getItemUseCount);
             $.godville.addWatcher("Аккумулировно маны", $.godville.getAccumulateCount);
         }
@@ -189,7 +189,7 @@ SwitcherButton = function(self, callback, time) {
             localStorage.setItem(self.val(), true);
         }
     });
-    if(localStorage.getItem(self.val())) {
+    if(localStorage.getItem(self.val()) == "true") {
         self.click();
     }
     return self;
