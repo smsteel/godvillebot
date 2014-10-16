@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.22
+// @version      0.23
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/superhero
@@ -87,15 +87,14 @@ SwitcherButton = function(self, callback, time) {
             //turn off
             clearTimeout(self._timeout);
             self._timeout = false;
-            self.css("background", red);
+            self.css("color", red);
         } else {
             //turn on            
             self._timeoutFun();
-            self.css("background", green);
+            self.css("color", green);
         }
     });
-    self.css("background", red);
-	self.css("margin-left", "4px");
+	self.css({"margin-left": "4px", "margin-top": "6px", "color": red});
     return self;
 }
 
@@ -110,7 +109,7 @@ $(document).ready(function() {
         digbutton = new SwitcherButton(
             $.godville.addSkill("Раскопки"),
             $.godville.autodig,
-            40000
+            60000
         );
     }, 1000);
 });
