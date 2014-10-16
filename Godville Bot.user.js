@@ -45,7 +45,7 @@ $.godville = {
         $("#cntrl1 > a.no_link.div_link.enc_link").click();
     },
     commandDig : function() {
-        $("#god_phrase").val("копать");
+        $("#god_phrase").val("копай");
         $("#voice_submit").click();
     },
     addSkill : function(text) {
