@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.21
+// @version      0.22
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/superhero
@@ -47,10 +47,10 @@ $.godville = {
         $("#voice_submit").click();
     },
     addSkill : function(text) {
-        skills = $("#s_b_id > ul");
-        element = $("<li><button>" + text + "</button></li>");
+        skills = $("#voice_submit_wrap");
+        element = $("<input type='button' value='" + text + "'>");
         skills.append(element);
-        return element.find("button");
+        return element;
     },
     autoheal : function() {
 		if($.godville.health().current < 10 && $.godville.mana() > 24) {
@@ -95,7 +95,7 @@ SwitcherButton = function(self, callback, time) {
         }
     });
     self.css("background", red);
-    self.css("border", 0);
+	self.css("margin-left", "4px");
     return self;
 }
 
