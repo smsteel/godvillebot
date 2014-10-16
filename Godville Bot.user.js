@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.1
+// @version      0.2
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/superhero
+// @updateUrl    https://github.com/smsteel/godvillebot/raw/master/Godville%20Bot.user.js
 // ==/UserScript==
 
 // API
@@ -112,5 +113,4 @@ $(document).ready(function() {
             20000
         );
     }, 1000);
-    $.getScript('http://yastatic.net/jquery/cookie/1.0/jquery.cookie.min.js');
 });
