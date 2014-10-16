@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.242
+// @version      0.300
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/superhero
@@ -44,6 +44,9 @@ $.godville = {
     addMana : function() {
         $("#acc_links_wrap > div:nth-child(1) > a").click();
     },
+    addCharges : function() {
+        $("#acc_links_wrap > div:nth-child(2) > a").click();
+    },
     makeGood : function() {
         $("#cntrl1 > a.no_link.div_link.enc_link").click();
     },
@@ -51,11 +54,11 @@ $.godville = {
         $("#god_phrase").val("копай");
         $("#voice_submit").click();
     },
-    addSkill : function(text) {
-        skills = $("#voice_submit_wrap");
+    addSwitcher : function(text, callback, time) {
+        skills = $("#godvillebot");
         element = $("<input type='button' value='" + text + "'>");
         skills.append(element);
-        return element;
+        SwitcherButton(element, callback, time);
     },
     autoheal : function() {
         if($.godville.health().current < 10 && $.godville.mana() > 24) {
@@ -83,13 +86,25 @@ $.godville = {
         }
     },
     autoaccumulate : function() {
-        //@todo-z Накопление праны при 0 зарядах, наличии хп и 100% праны
+        if($.godville.mana() == 100 && $.godville.charges() == 0 && $.godville.health().current > 40) {
+            $.godville.addCharges();
+        }
+    },
+    init : function() {
+        if(!$("#godvillebot").length) {
+            $("#right_block").append('<div class="block"><div class="block_h"><span class="l_slot"> <span class="b_handle m_hover" style="display: none;" title="Переместить блок">●</span> </span><div class="block_title">Автоматизация</div><span class="r_slot"><div border="0" align="middle" class="bar_spinner spinner_img" style="display: none;"></div><span class="h_min m_hover" style="display: none;">↑</span></span></div><div class="block_content" id="godvillebot" style="text-align: center"></div>');
+            $.godville.addSwitcher("Автохил", $.godville.autoheal, 1000);
+            $.godville.addSwitcher("Раскопки", $.godville.autodig, 60000);
+            $.godville.addSwitcher("Предметы", $.godville.autoactitem, 60000);
+            $.godville.addSwitcher("Аккумулятор", $.godville.autoaccumulate, 1000);
+        }
     }
 };
 
 SwitcherButton = function(self, callback, time) {
     red = "rgba(190, 19, 19, 1)";
     green = "rgba(49, 174, 84, 1)";
+    self.css({"margin-right": "3px", "margin-top": "3px", "color": red});
     $.extend(self, {
         _timeout : false,
         _process : false,
@@ -107,33 +122,21 @@ SwitcherButton = function(self, callback, time) {
             clearTimeout(self._timeout);
             self._timeout = false;
             self.css("color", red);
+            localStorage.setItem(self.val(), false);
         } else {
             //turn on            
             self._timeoutFun();
             self.css("color", green);
+            localStorage.setItem(self.val(), true);
         }
     });
-    self.css({"margin-right": "3px", "margin-top": "3px", "color": red});
+    if(localStorage.getItem(self.val())) {
+        self.click();
+    }
     return self;
 }
 
 // Init
 $(document).ready(function() {
-    setTimeout(function() {
-        healbutton = new SwitcherButton(
-            $.godville.addSkill("Автохил"),
-            $.godville.autoheal,
-            1000
-        );
-        digbutton = new SwitcherButton(
-            $.godville.addSkill("Раскопки"),
-            $.godville.autodig,
-            60000
-        );
-        itembutton = new SwitcherButton(
-            $.godville.addSkill("Предметы"),
-            $.godville.autoactitem,
-            60000
-        );
-    }, 1000);
+    setTimeout(function() { $.godville.init(); }, 1000);
 });
