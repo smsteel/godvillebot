@@ -74,10 +74,10 @@ $.godville = {
         }
     },
     autoactitem : function() {
-        if($.godville.mana() > 49 && $.godville.health().current() > 49) {
+        if($.godville.mana() > 49 && $.godville.health().current() > 49 && $.godville.actItems().length > 0) {
             $.godville.actItems().click();
         }
-        if($.godville.city() && $.godville.mana() < 50 && $.godville.charges() > 0) {
+        if($.godville.city() && $.godville.mana() < 50 && $.godville.charges() > 0 && $.godville.actItems().length > 0) {
             $.godville.addMana();
             setTimeout(function() { $.godville.actItems().click(); }, 500);
         }
