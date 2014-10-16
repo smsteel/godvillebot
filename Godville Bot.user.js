@@ -110,7 +110,7 @@ $(document).ready(function() {
         digbutton = new SwitcherButton(
             $.godville.addSkill("Раскопки"),
             $.godville.autodig,
-            20000
+            40000
         );
     }, 1000);
 });
