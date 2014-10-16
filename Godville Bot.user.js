@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.300
+// @version      0.311
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/superhero
@@ -10,8 +10,38 @@
 
 // API
 $.godville = {
-    healCount : 0,
-    digCount : 0,
+    setCounter : function(name) {
+        count = localStorage.getItem(name);
+        if(count) {
+            localStorage.setItem(name, count + 1);
+        } else {
+            localStorage.setItem(name, 1);
+        }
+    },
+    setHealCount : function() {
+        $.godville.setCounter("healcount");
+    },
+    getHealCount : function() {
+        return localStorage.getItem("healcount")
+    },
+    setDigCount : function() {
+        $.godville.setCounter("digcount");
+    },
+    getDigCount : function() {
+        return localStorage.getItem("digcount")
+    },
+    setItemUseCount : function() {
+        $.godville.setCounter("itemusecount");
+    },
+    getItemUseCount : function() {
+        return localStorage.getItem("itemusecount")
+    },
+    setAccumulateCount : function() {
+        $.godville.setCounter("accumulatecount");
+    },
+    getAccumulateCount : function() {
+        return localStorage.getItem("accumulatecount")
+    },
     health : function() {
         text = $("#hk_health > div.l_val").text().split('/');
         return {
@@ -27,12 +57,19 @@ $.godville = {
             return false;
         }
     },
+    isBoss : function() {
+        return ($("#o_info > div.block_content > div:nth-child(7) > div.l_val > a").length > 0)
+    },
     mana : function() {
         text = $("#cntrl > div.pbar.line > div.gp_val").text();
         return parseInt(text);
     },
     actItems : function() {
         return $(".item_act_link_div");
+    },
+    useItem : function() {
+        $.godville.actItems().click();
+        $.godville.setItemUseCount();
     },
     charges : function() {
        	text = $("#cntrl > div.acc_line.line > div.battery > span.acc_val").text();
@@ -46,13 +83,16 @@ $.godville = {
     },
     addCharges : function() {
         $("#acc_links_wrap > div:nth-child(2) > a").click();
+        $.godville.setAccumulateCount();
     },
     makeGood : function() {
         $("#cntrl1 > a.no_link.div_link.enc_link").click();
+        $.godville.setHealCount();
     },
     commandDig : function() {
         $("#god_phrase").val("копай");
         $("#voice_submit").click();
+        $.godville.setDigCount();
     },
     addSwitcher : function(text, callback, time) {
         skills = $("#godvillebot");
@@ -60,10 +100,24 @@ $.godville = {
         skills.append(element);
         SwitcherButton(element, callback, time);
     },
+    addWatcher : function(text, getter) {
+        watchers = $("#godvillestat");
+        element = $("<div>");
+        watchers.append(element);
+        $.extend(element, {
+            _timeoutFun : function() {
+                value = getter();
+                element.text(text + ": " + (value ? value : 0));
+                setTimeout(function() {
+                    element._timeoutFun();
+                }, 1000);
+            }
+        });
+        element._timeoutFun();
+    },
     autoheal : function() {
         if($.godville.health().current < 10 && $.godville.mana() > 24) {
             $.godville.makeGood();
-            $.godville.healCount += 1;
         }
         if($.godville.health().current < 10 && $.godville.mana() < 25 && $.godville.charges() > 0) {
             $.godville.addMana();
@@ -73,16 +127,15 @@ $.godville = {
         if(!($.godville.enemy()) && !($.godville.city()) && $.godville.health().current > 40 && $.godville.mana() > 40 && $.godville.charges() > 0)
         {
             $.godville.commandDig();
-            $.godville.digCount += 1;
         }
     },
     autoactitem : function() {
         if($.godville.mana() > 49 && $.godville.health().current() > 49 && $.godville.actItems().length > 0) {
-            $.godville.actItems().click();
+            $.godville.useItem();
         }
         if($.godville.city() && $.godville.mana() < 50 && $.godville.charges() > 0 && $.godville.actItems().length > 0) {
             $.godville.addMana();
-            setTimeout(function() { $.godville.actItems().click(); }, 500);
+            setTimeout(function() { $.godville.useItem(); }, 500);
         }
     },
     autoaccumulate : function() {
@@ -92,12 +145,18 @@ $.godville = {
     },
     init : function() {
         if(!$("#godvillebot").length) {
-            $("#right_block").append('<div class="block"><div class="block_h"><span class="l_slot"> <span class="b_handle m_hover" style="display: none;" title="Переместить блок">●</span> </span><div class="block_title">Автоматизация</div><span class="r_slot"><div border="0" align="middle" class="bar_spinner spinner_img" style="display: none;"></div><span class="h_min m_hover" style="display: none;">↑</span></span></div><div class="block_content" id="godvillebot" style="text-align: center"></div>');
+            $("#right_block").append('<div class="block"><div class="block_h"><div class="block_title">Автоматизация</div></div><div class="block_content" id="godvillebot" style="text-align: center"></div>');
+            $("#right_block").append('<div class="block"><div class="block_h"><div class="block_title">Статистика</div></div><div class="block_content" id="godvillestat"></div>');
             $.godville.addSwitcher("Автохил", $.godville.autoheal, 1000);
             $.godville.addSwitcher("Раскопки", $.godville.autodig, 60000);
             $.godville.addSwitcher("Предметы", $.godville.autoactitem, 60000);
             $.godville.addSwitcher("Аккумулятор", $.godville.autoaccumulate, 1000);
+            $.godville.addWatcher("Автолечение", $.godville.getHealCount);
+            $.godville.addWatcher("Автораскопок", $.godville.getHealCount);
+            $.godville.addWatcher("Использовано предметов", $.godville.getItemUseCount);
+            $.godville.addWatcher("Аккумулировно маны", $.godville.getAccumulateCount);
         }
+        setTimeout(function() { $.godville.init(); }, 1000);
     }
 };
 
