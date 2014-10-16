@@ -33,7 +33,7 @@ $.godville = {
     },
     actItems : function() {
         return $(".item_act_link_div");
-    }
+    },
     charges : function() {
        	text = $("#cntrl > div.acc_line.line > div.battery > span.acc_val").text();
         return parseInt(text);
