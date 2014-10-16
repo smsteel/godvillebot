@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.23
+// @version      0.231
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/superhero
@@ -10,6 +10,8 @@
 
 // API
 $.godville = {
+	healCount : 0,
+	digCount : 0,
     health : function() {
    		text = $("#hk_health > div.l_val").text().split('/');
         return {
@@ -55,6 +57,7 @@ $.godville = {
     autoheal : function() {
 		if($.godville.health().current < 10 && $.godville.mana() > 24) {
 			$.godville.makeGood();
+			$.godville.healCount += 1;
         }
 		if($.godville.health().current < 10 && $.godville.mana() < 25 && $.godville.charges() > 0) {
             $.godville.addCharges();
@@ -64,13 +67,14 @@ $.godville = {
         if(!($.godville.enemy()) && !($.godville.city()) && $.godville.health().current > 40 && $.godville.mana() > 40 && $.godville.charges() > 0)
         {
             $.godville.commandDig();
+			$.godville.digCount += 1;
         }
     }
 };
 
 SwitcherButton = function(self, callback, time) {
-    red = "rgba(255, 0, 0, 0.44)";
-    green = "rgba(0, 255, 71, 0.44)";
+    red = "rgba(190, 19, 19, 1)";
+    green = "rgba(49, 174, 84, 1)";
     $.extend(self, {
         _timeout : false,
         _process : false,
@@ -94,7 +98,7 @@ SwitcherButton = function(self, callback, time) {
             self.css("color", green);
         }
     });
-	self.css({"margin-left": "4px", "margin-top": "6px", "color": red});
+	self.css({"margin-left": "4px", "margin-top": "4px", "color": red});
     return self;
 }
 
