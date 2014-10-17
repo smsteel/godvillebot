@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.311
+// @version      0.312
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/superhero
@@ -11,7 +11,7 @@
 // API
 $.godville = {
     setCounter : function(name) {
-        count = localStorage.getItem(name);
+        count = parseInt(localStorage.getItem(name));
         if(count) {
             localStorage.setItem(name, count + 1);
         } else {
@@ -100,27 +100,24 @@ $.godville = {
         skills.append(element);
         SwitcherButton(element, callback, time);
     },
-    addWatcher : function(text, getter) {
+    addWatcher : function(text, callback) {
         watchers = $("#godvillestat");
         element = $("<div>");
         watchers.append(element);
-        $.extend(element, {
-            _timeoutFun : function() {
-                value = getter();
-                element.text(text + ": " + (value ? value : 0));
-                setTimeout(function() {
-                    element._timeoutFun();
-                }, 1000);
-            }
-        });
-        element._timeoutFun();
+        Watcher(element, text, callback);
     },
     autoheal : function() {
-        if($.godville.health().current < 10 && $.godville.mana() > 24) {
+        if($.godville.health().current < 15 && $.godville.mana() > 24) {
             $.godville.makeGood();
         }
-        if($.godville.health().current < 10 && $.godville.mana() < 25 && $.godville.charges() > 0) {
+        if($.godville.health().current < 15 && $.godville.mana() < 25 && $.godville.charges() > 0) {
             $.godville.addMana();
+        }
+        if($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() > 24) {
+            $.godville.makeGood();
+        }
+        if($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() < 25 && $.godville.charges() > 0) {
+            $godville.addMana();
         }
     },
     autodig : function() {
@@ -193,6 +190,21 @@ SwitcherButton = function(self, callback, time) {
         self.click();
     }
     return self;
+}
+
+Watcher = function(self, text, callback) {
+    $.extend(self, {
+        _text : text,
+        _callback : callback,
+        _timeoutFun : function() {
+            value = self._callback();
+            self.text(self._text + ": " + (value ? value : 0));
+            setTimeout(function() {
+                self._timeoutFun();
+            }, 1000);
+        }
+    });
+    self._timeoutFun();
 }
 
 // Init
