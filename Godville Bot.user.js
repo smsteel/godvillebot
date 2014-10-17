@@ -117,7 +117,7 @@ $.godville = {
             $.godville.makeGood();
         }
         if($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() < 25 && $.godville.charges() > 0) {
-            $godville.addMana();
+            $.godville.addMana();
         }
     },
     autodig : function() {
