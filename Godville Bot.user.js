@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.312
+// @version      0.313
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/superhero
