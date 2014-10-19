@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.313
+// @version      0.323
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
-// @match        http://godville.net/superhero
+// @match        http://godville.net/*
 // @updateUrl    https://github.com/smsteel/godvillebot/raw/master/Godville%20Bot.user.js
 // ==/UserScript==
 
@@ -81,6 +81,9 @@ $.godville = {
     addMana : function() {
         $("#acc_links_wrap > div:nth-child(1) > a").click();
     },
+    necromancy : function() {
+        $("#cntrl1 > a:nth-child(3)").click();
+    },
     addCharges : function() {
         $("#acc_links_wrap > div:nth-child(2) > a").click();
         $.godville.setAccumulateCount();
@@ -107,17 +110,21 @@ $.godville = {
         Watcher(element, text, callback);
     },
     autoheal : function() {
-        if($.godville.health().current < 15 && $.godville.mana() > 24) {
-            $.godville.makeGood();
-        }
-        if($.godville.health().current < 15 && $.godville.mana() < 25 && $.godville.charges() > 0) {
-            $.godville.addMana();
-        }
-        if($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() > 24) {
-            $.godville.makeGood();
-        }
-        if($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() < 25 && $.godville.charges() > 0) {
-            $.godville.addMana();
+        if($.godville.health().current == 0) {
+            $.godville.necromancy();
+        } else {
+            if ($.godville.health().current < 15 && $.godville.mana() > 24) {
+                $.godville.makeGood();
+            }
+            if ($.godville.health().current < 15 && $.godville.mana() < 25 && $.godville.charges() > 0) {
+                $.godville.addMana();
+            }
+            if ($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() > 24) {
+                $.godville.makeGood();
+            }
+            if ($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() < 25 && $.godville.charges() > 0) {
+                $.godville.addMana();
+            }
         }
     },
     autodig : function() {
@@ -141,6 +148,9 @@ $.godville = {
         }
     },
     init : function() {
+        if($("#m_hero > a").attr("href") == "/superhero") {
+             window.location.href = "/superhero";
+        }
         if(!$("#godvillebot").length) {
             $("#right_block").append('<div class="block"><div class="block_h"><div class="block_title">Автоматизация</div></div><div class="block_content" id="godvillebot" style="text-align: center"></div>');
             $("#right_block").append('<div class="block"><div class="block_h"><div class="block_title">Статистика</div></div><div class="block_content" id="godvillestat"></div>');
