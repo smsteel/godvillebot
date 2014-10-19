@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.323
+// @version      0.324
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -143,7 +143,7 @@ $.godville = {
         }
     },
     autoaccumulate : function() {
-        if($.godville.mana() == 100 && $.godville.charges() == 0 && $.godville.health().current > 40) {
+        if($.godville.city() && $.godville.mana() == 100 && $.godville.charges() == 0) {
             $.godville.addCharges();
         }
     },
