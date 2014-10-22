@@ -116,25 +116,48 @@ $.godville = {
     },
     autoheal : function() {
         //@todo Переделать логику на более очевидную (выпилить быдлокод)
+        // сделал то, то очевиджно бросается в глаза...
+        // сложно рефакторить не понимая что вообще происходит тут
         if($.godville.health().current == 0) {
             $.godville.necromancy();
-        } else {
-            if ($.godville.enemy() && !($.godville.isBoss()) && $.godville.enemyProgress() > 70) {
-                return;
-            }
-            if ($.godville.enemy() && $.godville.health().current < 15 && $.godville.mana() > 24) {
-                $.godville.makeGood();
-            }
-            if ($.godville.enemy() && $.godville.health().current < 15 && $.godville.mana() < 25 && $.godville.charges() > 0) {
-                $.godville.addMana();
-            }
-            if ($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() > 24) {
-                $.godville.makeGood();
-            }
-            if ($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() < 25 && $.godville.charges() > 0) {
-                $.godville.addMana();
-            }
+            return;
         }
+
+        if (!$.godville.enemy()) {
+            return;
+        }
+
+        if (!($.godville.isBoss()) && $.godville.enemyProgress() > 70) {
+            return;
+        }
+
+        if (
+            $.godville.mana() > 24
+            && (
+                $.godville.health().current < 15
+                || ( // @todo возмжно, логически, это условие можно вынести вметод для ясности
+                    $.godville.isBoss()
+                    && $.godville.health.current < 45
+                )
+            )
+        ) {
+            $.godville.makeGood();
+        }
+
+        if (
+            $.godville.mana() < 25
+            && $.godville.charges() > 0
+            && (
+                $.godville.health().current < 15
+                || ( // @todo возмжно, логически, это условие можно вынести вметод для ясности
+                    $.godville.isBoss()
+                    && $.godville.health.current < 45
+                )
+            )
+        ) {
+            $.godville.addMana();
+        }
+
     },
     autodig : function() {
         if(!($.godville.enemy()) && !($.godville.city()) && $.godville.health().current > 40 && $.godville.mana() > 40 && $.godville.charges() > 0)
