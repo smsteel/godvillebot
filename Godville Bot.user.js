@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.324
+// @version      0.325
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -113,10 +113,10 @@ $.godville = {
         if($.godville.health().current == 0) {
             $.godville.necromancy();
         } else {
-            if ($.godville.health().current < 15 && $.godville.mana() > 24) {
+            if ($.godville.enemy() && $.godville.health().current < 15 && $.godville.mana() > 24) {
                 $.godville.makeGood();
             }
-            if ($.godville.health().current < 15 && $.godville.mana() < 25 && $.godville.charges() > 0) {
+            if ($.godville.enemy() && $.godville.health().current < 15 && $.godville.mana() < 25 && $.godville.charges() > 0) {
                 $.godville.addMana();
             }
             if ($.godville.enemy() && $.godville.isBoss() && $.godville.health.current < 45 && $.godville.mana() > 24) {
