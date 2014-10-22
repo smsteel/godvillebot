@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.335
+// @version      0.345
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -114,50 +114,46 @@ $.godville = {
         watchers.append(element);
         Watcher(element, text, callback);
     },
+    isHealNeeded : function() {
+        return (
+            // Если это просто противник, то хилить только при менее 15 здоровья
+            $.godville.health().current < 15
+            || (
+                $.godville.isBoss() // Если противник босс, то хилить при менее 45
+                && $.godville.health().current < 45
+            )
+        );
+    },
     autoheal : function() {
-        //@todo Переделать логику на более очевидную (выпилить быдлокод)
-        // сделал то, то очевиджно бросается в глаза...
-        // сложно рефакторить не понимая что вообще происходит тут
+        // Если персонаж мертв, воскрешаем
         if($.godville.health().current == 0) {
             $.godville.necromancy();
             return;
         }
-
+        // Если нет врага, не лечим, пустая трата маны
         if (!$.godville.enemy()) {
             return;
         }
-
+        // Если враг не босс и почти добит, тоже лечить не надо
         if (!($.godville.isBoss()) && $.godville.enemyProgress() > 70) {
             return;
         }
-
-        if (
-            $.godville.mana() > 24
-            && (
-                $.godville.health().current < 15
-                || ( // @todo возмжно, логически, это условие можно вынести вметод для ясности
-                    $.godville.isBoss()
-                    && $.godville.health.current < 45
-                )
-            )
-        ) {
-            $.godville.makeGood();
-        }
-
+        // Если нет маны, есть заряды, жизни мало, то добавляем ману из заряда
         if (
             $.godville.mana() < 25
             && $.godville.charges() > 0
-            && (
-                $.godville.health().current < 15
-                || ( // @todo возмжно, логически, это условие можно вынести вметод для ясности
-                    $.godville.isBoss()
-                    && $.godville.health.current < 45
-                )
-            )
+            && $.godville.isHealNeeded()
         ) {
             $.godville.addMana();
+            return;
         }
-
+        // Если есть мана, то хилим
+        if (
+            $.godville.mana() > 24
+            && $.godville.isHealNeeded()
+        ) {
+            $.godville.makeGood();
+        }
     },
     autodig : function() {
         if(!($.godville.enemy()) && !($.godville.city()) && $.godville.health().current > 40 && $.godville.mana() > 40 && $.godville.charges() > 0)
