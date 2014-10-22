@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.325
+// @version      0.335
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -9,7 +9,9 @@
 // ==/UserScript==
 
 // API
+//@todo разделить API и бота на разные части
 $.godville = {
+    //@todo переделать setCounter и все связанное
     setCounter : function(name) {
         count = parseInt(localStorage.getItem(name));
         if(count) {
@@ -56,6 +58,9 @@ $.godville = {
         } else {
             return false;
         }
+    },
+    enemyProgress : function() {
+        return parseInt($("#news > div.block_content > div:nth-child(1) > div:nth-child(1) > div.p_bar.monster_pb > div").css("width"));
     },
     isBoss : function() {
         return ($("#o_info > div.block_content > div:nth-child(7) > div.l_val > a").length > 0)
@@ -110,9 +115,13 @@ $.godville = {
         Watcher(element, text, callback);
     },
     autoheal : function() {
+        //@todo Переделать логику на более очевидную (выпилить быдлокод)
         if($.godville.health().current == 0) {
             $.godville.necromancy();
         } else {
+            if ($.godville.enemy() && !($.godville.isBoss()) && $.godville.enemyProgress() > 70) {
+                return;
+            }
             if ($.godville.enemy() && $.godville.health().current < 15 && $.godville.mana() > 24) {
                 $.godville.makeGood();
             }
@@ -200,7 +209,7 @@ SwitcherButton = function(self, callback, time) {
         self.click();
     }
     return self;
-}
+};
 
 Watcher = function(self, text, callback) {
     $.extend(self, {
@@ -215,7 +224,7 @@ Watcher = function(self, text, callback) {
         }
     });
     self._timeoutFun();
-}
+};
 
 // Init
 $(document).ready(function() {
