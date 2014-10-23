@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.355
+// @version      0.356
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -117,11 +117,12 @@ $.godville = {
             // Если это просто противник, то хилить только при менее 15 здоровья
             $.godville.health().current < 15
             || (
-                $.godville.isBoss() // Если противник босс, то хилить при менее 45
-                && $.godville.health().current < 45
+                $.godville.isBoss() // Если противник босс, то хилить при менее 40% здоровья
+                && (($.godville.health().current / $.godville.health().maximum) < 0.4)
             )
         );
     },
+    //@todo хилить словами
     autoheal : function() {
         // Если персонаж мертв, воскрешаем
         if($.godville.health().current == 0) {
