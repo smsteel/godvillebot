@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.356
+// @version      0.360
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -50,6 +50,18 @@ $.godville = {
             current : parseInt(text[0]),
             maximum : parseInt(text[1])
         }
+    },
+    itemsValue : function() {
+        return eval($(".eq_line").find(".eq_level").text());
+    },
+    getItemsProfit : function() {
+        lastDate = localStorage.getItem("itemsProfitLastDate");
+        currentDate = new Date().toDateString();
+        if (lastDate != currentDate) {
+            localStorage.setItem("itemsValue", $.godville.itemsValue());
+            localStorage.setItem("itemsProfitLastDate", currentDate);
+        }
+        return $.godville.itemsValue() - parseInt(localStorage.getItem("itemsValue"));
     },
     enemy : function() {
     	return (
@@ -110,6 +122,16 @@ $.godville = {
         watchers = $("#godvillestat");
         element = $("<div>");
         watchers.append(element);
+        Watcher(element, text, callback);
+    },
+    addPanelWatcher : function(panel, text, callback) {
+        css = {
+            "background" : "rgba(161, 237, 194, 0.41)",
+            "margin" : "-4px",
+            "padding" : "4px"
+        };
+        var element = $("<div>").css(css);
+        panel.append(element);
         Watcher(element, text, callback);
     },
     isHealNeeded : function() {
@@ -191,6 +213,7 @@ $.godville = {
             $.godville.addWatcher("Автораскопок", $.godville.getDigCount);
             $.godville.addWatcher("Использовано предметов", $.godville.getItemUseCount);
             $.godville.addWatcher("Аккумулировно маны", $.godville.getAccumulateCount);
+            $.godville.addPanelWatcher($("#equipment"), "Бонус шмоток за сегодня", $.godville.getItemsProfit);
         }
         setTimeout(function() { $.godville.init(); }, 1000);
     }
