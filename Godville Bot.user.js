@@ -52,12 +52,10 @@ $.godville = {
         }
     },
     enemy : function() {
-    	exists = $("#hk_monster_name").is(':visible');
-        if(exists) {   
-            return $("#hk_monster_name > div.l_val").text();
-        } else {
-            return false;
-        }
+    	return (
+            $("#hk_monster_name").is(':visible')
+            || ($("#opps > div.block_content > div:nth-child(1) > div > div > div.opp_n").length > 0)
+        );
     },
     enemyProgress : function() {
         return parseInt($("#news > div.block_content > div:nth-child(1) > div:nth-child(1) > div.p_bar.monster_pb > div").css("width"));
@@ -161,8 +159,9 @@ $.godville = {
             $.godville.commandDig();
         }
     },
+    //@todo рефакторинг
     autoactitem : function() {
-        if($.godville.mana() > 49 && $.godville.health().current() > 49 && $.godville.actItems().length > 0) {
+        if($.godville.mana() > 49 && $.godville.health().current > 49 && $.godville.actItems().length > 0) {
             $.godville.useItem();
         }
         if($.godville.city() && $.godville.mana() < 50 && $.godville.charges() > 0 && $.godville.actItems().length > 0) {
@@ -179,6 +178,7 @@ $.godville = {
         if($("#m_hero > a").attr("href") == "/superhero") {
              window.location.href = "/superhero";
         }
+        //@todo сделать поддержку блоков на арене
         if(!$("#godvillebot").length) {
             $("#right_block").append('<div class="block"><div class="block_h"><div class="block_title">Автоматизация</div></div><div class="block_content" id="godvillebot" style="text-align: center"></div>');
             $("#right_block").append('<div class="block"><div class="block_h"><div class="block_title">Статистика</div></div><div class="block_content" id="godvillestat"></div>');
@@ -195,6 +195,7 @@ $.godville = {
     }
 };
 
+//@todo Разделить саму кнопку и циклы
 SwitcherButton = function(self, callback, time) {
     red = "rgba(190, 19, 19, 1)";
     green = "rgba(49, 174, 84, 1)";
@@ -230,6 +231,7 @@ SwitcherButton = function(self, callback, time) {
     return self;
 };
 
+//@todo Сделать возможность "деструктора"
 Watcher = function(self, text, callback) {
     $.extend(self, {
         _text : text,
