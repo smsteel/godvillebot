@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.360
+// @version      0.400
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -13,7 +13,7 @@
 $.godville = {
     //@todo переделать setCounter и все связанное
     setCounter : function(name) {
-        count = parseInt(localStorage.getItem(name));
+        var count = parseInt(localStorage.getItem(name));
         if(count) {
             localStorage.setItem(name, count + 1);
         } else {
@@ -36,7 +36,7 @@ $.godville = {
         $.godville.setCounter("itemusecount");
     },
     getItemUseCount : function() {
-        return localStorage.getItem("itemusecount")
+        return localStorage.getItem("itemusecount");
     },
     setAccumulateCount : function() {
         $.godville.setCounter("accumulatecount");
@@ -45,7 +45,7 @@ $.godville = {
         return localStorage.getItem("accumulatecount")
     },
     health : function() {
-        text = $("#hk_health > div.l_val").text().split('/');
+        var text = $("#hk_health > div.l_val").text().split('/');
         return {
             current : parseInt(text[0]),
             maximum : parseInt(text[1])
@@ -55,8 +55,8 @@ $.godville = {
         return eval($(".eq_line").find(".eq_level").text());
     },
     getItemsProfit : function() {
-        lastDate = localStorage.getItem("itemsProfitLastDate");
-        currentDate = new Date().toDateString();
+        var lastDate = localStorage.getItem("itemsProfitLastDate");
+        var currentDate = new Date().toDateString();
         if (lastDate != currentDate) {
             localStorage.setItem("itemsValue", $.godville.itemsValue());
             localStorage.setItem("itemsProfitLastDate", currentDate);
@@ -76,7 +76,7 @@ $.godville = {
         return ($("#o_info > div.block_content > div:nth-child(7) > div.l_val > a").length > 0)
     },
     mana : function() {
-        text = $("#cntrl > div.pbar.line > div.gp_val").text();
+        var text = $("#cntrl > div.pbar.line > div.gp_val").text();
         return parseInt(text);
     },
     actItems : function() {
@@ -87,7 +87,7 @@ $.godville = {
         $.godville.setItemUseCount();
     },
     charges : function() {
-       	text = $("#cntrl > div.acc_line.line > div.battery > span.acc_val").text();
+       	var text = $("#cntrl > div.acc_line.line > div.battery > span.acc_val").text();
         return parseInt(text);
     },
     city : function() {
@@ -113,19 +113,19 @@ $.godville = {
         $.godville.setDigCount();
     },
     addSwitcher : function(text, callback, time) {
-        skills = $("#godvillebot");
-        element = $("<input type='button' value='" + text + "'>");
+        var skills = $("#godvillebot");
+        var element = $("<input type='button' value='" + text + "'>");
         skills.append(element);
         SwitcherButton(element, callback, time);
     },
     addWatcher : function(text, callback) {
-        watchers = $("#godvillestat");
-        element = $("<div>");
+        var watchers = $("#godvillestat");
+        var element = $("<div>");
         watchers.append(element);
         Watcher(element, text, callback);
     },
     addPanelWatcher : function(panel, text, callback) {
-        css = {
+        var css = {
             "background" : "rgba(161, 237, 194, 0.41)",
             "margin" : "-4px",
             "padding" : "4px"
@@ -221,8 +221,8 @@ $.godville = {
 
 //@todo Разделить саму кнопку и циклы
 SwitcherButton = function(self, callback, time) {
-    red = "rgba(190, 19, 19, 1)";
-    green = "rgba(49, 174, 84, 1)";
+    var red = "rgba(190, 19, 19, 1)";
+    var green = "rgba(49, 174, 84, 1)";
     self.css({"margin-right": "3px", "margin-top": "3px", "color": red});
     $.extend(self, {
         _timeout : false,
@@ -261,7 +261,7 @@ Watcher = function(self, text, callback) {
         _text : text,
         _callback : callback,
         _timeoutFun : function() {
-            value = self._callback();
+            var value = self._callback();
             self.text(self._text + ": " + (value ? value : 0));
             setTimeout(function() {
                 self._timeoutFun();
@@ -271,7 +271,54 @@ Watcher = function(self, text, callback) {
     self._timeoutFun();
 };
 
+EquipmentMemory = function() {
+    self = {
+        getItemCache : function(i) {
+            localStorage.getItem("eqcache_" + i);
+        },
+        setItemCache : function(i, val) {
+            localStorage.setItem("eqcache_" + i, val);
+        },
+        init : function() {
+            $("head").append('<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">');
+            $.getScript("http://yastatic.net/jquery-ui/1.11.1/jquery-ui.min.js")
+                .done(function() {
+                    $(document).tooltip({
+                        items: ".eq_line",
+                        position: {
+                            at: "left bottom-15"
+                        }
+                    });
+                });
+            $(".eq_line").each(function() { $(this).css("cursor", "pointer"); });
+            $(".eq_line").hover(
+                function() { $(this).css("background", "white") },
+                function() { $(this).css("background", "inherit") }
+            );
+            return self;
+        },
+        run : function() {
+            $(".eq_line").each(function(i) {
+                var cache = self.getItemCache(i);
+                var item = $(this);
+                var caption = item.find(".eq_name").text();
+                var level = item.find(".eq_level").text();
+                var itemText = caption + ' ' + level;
+                if (!cache || (cache != itemText)) {
+                    item.attr("title", cache);
+                    self.setItemCache(i, itemText);
+                }
+            });
+            setTimeout(function() { self.run(); }, 1000);
+        }
+    };
+    return self;
+};
+
 // Init
 $(document).ready(function() {
-    setTimeout(function() { $.godville.init(); }, 1000);
+    setTimeout(function() {
+        $.godville.init();
+        EquipmentMemory().init().run();
+    }, 1000);
 });
