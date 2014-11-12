@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.400
+// @version      0.410
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -69,6 +69,9 @@ $.godville = {
             || ($("#opps > div.block_content > div:nth-child(1) > div > div > div.opp_n").length > 0)
         );
     },
+    gold : function() {
+        return parseInt($("#hk_gold_we > div.l_val").text().match(/\d+/)[0]);
+    },
     enemyProgress : function() {
         return parseInt($("#news > div.block_content > div:nth-child(1) > div:nth-child(1) > div.p_bar.monster_pb > div").css("width"));
     },
@@ -80,7 +83,7 @@ $.godville = {
         return parseInt(text);
     },
     actItems : function() {
-        return $(".item_act_link_div");
+        return $("a.item_act_link_div");
     },
     useItem : function() {
         $.godville.actItems().click();
@@ -182,15 +185,18 @@ $.godville = {
             $.godville.commandDig();
         }
     },
-    //@todo рефакторинг
     autoactitem : function() {
-        if($.godville.mana() > 49 && $.godville.health().current > 49 && $.godville.actItems().length > 0) {
-            $.godville.useItem();
-        }
-        if($.godville.city() && $.godville.mana() < 50 && $.godville.charges() > 0 && $.godville.actItems().length > 0) {
-            $.godville.addMana();
-            setTimeout(function() { $.godville.useItem(); }, 500);
-        }
+        $.godville.actItems().each(function() {
+            // Если предмет делает золотой кирпич, то активируем его в городе, когда есть мана и 3к голды
+            if(
+                this.title.indexOf("кирпич") >= 0
+                && $.godville.city()
+                && $.godville.mana() > 49
+                && $.godville.gold() > 3000
+            ) {
+
+            }
+        });
     },
     autoaccumulate : function() {
         if($.godville.city() && $.godville.mana() == 100 && $.godville.charges() == 0) {
@@ -207,7 +213,7 @@ $.godville = {
             $("#right_block").append('<div class="block"><div class="block_h"><div class="block_title">Статистика</div></div><div class="block_content" id="godvillestat"></div>');
             $.godville.addSwitcher("Автохил", $.godville.autoheal, 1000);
             $.godville.addSwitcher("Раскопки", $.godville.autodig, 60000);
-            $.godville.addSwitcher("Предметы", $.godville.autoactitem, 60000);
+            $.godville.addSwitcher("Предметы", $.godville.autoactitem, 1000);
             $.godville.addSwitcher("Аккумулятор", $.godville.autoaccumulate, 1000);
             $.godville.addWatcher("Автолечение", $.godville.getHealCount);
             $.godville.addWatcher("Автораскопок", $.godville.getDigCount);
