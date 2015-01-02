@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Godville Bot
 // @namespace    http://godville.net/
-// @version      0.410
+// @version      0.411
 // @description  Godville Automatic Stuff
 // @author       UnstableFractal
 // @match        http://godville.net/*
@@ -194,7 +194,12 @@ $.godville = {
                 && $.godville.mana() > 49
                 && $.godville.gold() > 3000
             ) {
-
+                this.click();
+            }
+            if(
+                this.title.indexOf("без затрат праны") >= 0
+            ) {
+                this.click();
             }
         });
     },
